@@ -39,36 +39,36 @@ struct mfb_window* mfb_open_ex (const char *title, unsigned width, unsigned heig
   XSizeHints sizeHints;
   Visual* visual;
 
-  SWindowData *window_data = (SWindowData *) malloc(sizeof(SWindowData));
+  SWindowData* window_data = (SWindowData*)malloc (sizeof(SWindowData));
   if (!window_data)
     return 0x0;
   memset(window_data, 0, sizeof(SWindowData));
 
-  SWindowData_X11 *window_data_x11 = (SWindowData_X11 *) malloc(sizeof(SWindowData_X11));
+  SWindowData_X11* window_data_x11 = (SWindowData_X11*)malloc (sizeof(SWindowData_X11));
   if (!window_data_x11) {
-    free(window_data);
+    free (window_data);
     return 0x0;
     }
   memset (window_data_x11, 0, sizeof(SWindowData_X11));
   window_data->specific = window_data_x11;
 
-  window_data_x11->display = XOpenDisplay(0);
+  window_data_x11->display = XOpenDisplay (0);
   if (!window_data_x11->display) {
-    free(window_data);
-    free(window_data_x11);
+    free (window_data);
+    free (window_data_x11);
     return 0x0;
     }
 
-  init_keycodes(window_data_x11);
-  XAutoRepeatOff(window_data_x11->display);
+  init_keycodes (window_data_x11);
+  XAutoRepeatOff (window_data_x11->display);
 
-  window_data_x11->screen = DefaultScreen(window_data_x11->display);
+  window_data_x11->screen = DefaultScreen (window_data_x11->display);
 
-  visual   = DefaultVisual(window_data_x11->display, window_data_x11->screen);
-  formats  = XListPixmapFormats(window_data_x11->display, &formatCount);
-  depth    = DefaultDepth(window_data_x11->display, window_data_x11->screen);
+  visual = DefaultVisual(window_data_x11->display, window_data_x11->screen);
+  formats = XListPixmapFormats (window_data_x11->display, &formatCount);
+  depth = DefaultDepth (window_data_x11->display, window_data_x11->screen);
 
-  Window defaultRootWindow = DefaultRootWindow(window_data_x11->display);
+  Window defaultRootWindow = DefaultRootWindow (window_data_x11->display);
 
   for (i = 0; i < formatCount; ++i) {
     if (depth == formats[i].depth) {
@@ -77,7 +77,7 @@ struct mfb_window* mfb_open_ex (const char *title, unsigned width, unsigned heig
       }
     }
 
-  XFree(formats);
+  XFree (formats);
 
   // We only support 32-bit right now
   if (convDepth != 32) {
@@ -85,8 +85,8 @@ struct mfb_window* mfb_open_ex (const char *title, unsigned width, unsigned heig
     return 0x0;
     }
 
-  int screenWidth  = DisplayWidth(window_data_x11->display, window_data_x11->screen);
-  int screenHeight = DisplayHeight(window_data_x11->display, window_data_x11->screen);
+  int screenWidth  = DisplayWidth (window_data_x11->display, window_data_x11->screen);
+  int screenHeight = DisplayHeight (window_data_x11->display, window_data_x11->screen);
 
   windowAttributes.border_pixel = BlackPixel (window_data_x11->display, window_data_x11->screen);
   windowAttributes.background_pixel = BlackPixel (window_data_x11->display, window_data_x11->screen);
@@ -106,13 +106,13 @@ struct mfb_window* mfb_open_ex (const char *title, unsigned width, unsigned heig
     posY         = 0;
     windowWidth  = screenWidth;
     windowHeight = screenHeight;
-   }
+    }
   else {
     posX         = (screenWidth  - width)  / 2;
     posY         = (screenHeight - height) / 2;
     windowWidth  = width;
     windowHeight = height;
-   }
+    }
 
   window_data_x11->window = XCreateWindow (window_data_x11->display,
                                            defaultRootWindow,
@@ -125,44 +125,43 @@ struct mfb_window* mfb_open_ex (const char *title, unsigned width, unsigned heig
                                            CWBackPixel | CWBorderPixel | CWBackingStore,
                                            &windowAttributes);
   if (!window_data_x11->window)
-      return 0x0;
+    return 0x0;
 
-  XSelectInput(window_data_x11->display, window_data_x11->window,
-      KeyPressMask | KeyReleaseMask
-      | ButtonPressMask | ButtonReleaseMask | PointerMotionMask
-      | StructureNotifyMask | ExposureMask
-      | FocusChangeMask
-      | EnterWindowMask | LeaveWindowMask
-  );
+  XSelectInput (window_data_x11->display, window_data_x11->window,
+                KeyPressMask | KeyReleaseMask
+                | ButtonPressMask | ButtonReleaseMask | PointerMotionMask
+                | StructureNotifyMask | ExposureMask
+                | FocusChangeMask
+                | EnterWindowMask | LeaveWindowMask
+                );
 
   XStoreName (window_data_x11->display, window_data_x11->window, title);
 
   if (flags & WF_BORDERLESS) {
     struct StyleHints {
-          unsigned long   flags;
-          unsigned long   functions;
-          unsigned long   decorations;
-          long            inputMode;
-          unsigned long   status;
-      } sh = {
-          .flags       = 2,
-          .functions   = 0,
-          .decorations = 0,
-          .inputMode   = 0,
-          .status      = 0,
-      };
-    Atom sh_p = XInternAtom(window_data_x11->display, "_MOTIF_WM_HINTS", True);
-    XChangeProperty(window_data_x11->display, window_data_x11->window, sh_p, sh_p, 32, PropModeReplace, (unsigned char*)&sh, 5);
+      unsigned long   flags;
+      unsigned long   functions;
+      unsigned long   decorations;
+      long            inputMode;
+      unsigned long   status;
+      } sh = { .flags       = 2,
+               .functions   = 0,
+               .decorations = 0,
+               .inputMode   = 0,
+               .status      = 0,
+             };
+    Atom sh_p = XInternAtom (window_data_x11->display, "_MOTIF_WM_HINTS", True);
+    XChangeProperty (window_data_x11->display, window_data_x11->window, sh_p, sh_p, 32, PropModeReplace, (unsigned char*)&sh, 5);
     }
 
   if (flags & WF_ALWAYS_ON_TOP) {
-    Atom sa_p = XInternAtom(window_data_x11->display, "_NET_WM_STATE_ABOVE", False);
-    XChangeProperty(window_data_x11->display, window_data_x11->window, XInternAtom(window_data_x11->display, "_NET_WM_STATE", False), XA_ATOM, 32, PropModeReplace, (unsigned char *)&sa_p, 1);
+    Atom sa_p = XInternAtom (window_data_x11->display, "_NET_WM_STATE_ABOVE", False);
+    XChangeProperty (window_data_x11->display, window_data_x11->window, XInternAtom(window_data_x11->display, "_NET_WM_STATE", False), XA_ATOM, 32, PropModeReplace, (unsigned char *)&sa_p, 1);
     }
 
   if (flags & WF_FULLSCREEN) {
-    Atom sf_p = XInternAtom(window_data_x11->display, "_NET_WM_STATE_FULLSCREEN", True);
-    XChangeProperty(window_data_x11->display, window_data_x11->window, XInternAtom(window_data_x11->display, "_NET_WM_STATE", True), XA_ATOM, 32, PropModeReplace, (unsigned char*)&sf_p, 1);
+    Atom sf_p = XInternAtom (window_data_x11->display, "_NET_WM_STATE_FULLSCREEN", True);
+    XChangeProperty (window_data_x11->display, window_data_x11->window, XInternAtom(window_data_x11->display, "_NET_WM_STATE", True), XA_ATOM, 32, PropModeReplace, (unsigned char*)&sf_p, 1);
     }
 
   sizeHints.flags      = PPosition | PMinSize | PMaxSize;
@@ -179,22 +178,21 @@ struct mfb_window* mfb_open_ex (const char *title, unsigned width, unsigned heig
     sizeHints.max_height = height;
     }
 
-  s_delete_window_atom = XInternAtom(window_data_x11->display, "WM_DELETE_WINDOW", False);
-  XSetWMProtocols(window_data_x11->display, window_data_x11->window, &s_delete_window_atom, 1);
+  s_delete_window_atom = XInternAtom (window_data_x11->display, "WM_DELETE_WINDOW", False);
+  XSetWMProtocols (window_data_x11->display, window_data_x11->window, &s_delete_window_atom, 1);
 
-  if (create_GL_context(window_data) == false) {
+  if (create_GL_context (window_data) == false)
     return 0x0;
-    }
 
-  XSetWMNormalHints(window_data_x11->display, window_data_x11->window, &sizeHints);
-  XClearWindow(window_data_x11->display, window_data_x11->window);
-  XMapRaised(window_data_x11->display, window_data_x11->window);
-  XFlush(window_data_x11->display);
+  XSetWMNormalHints (window_data_x11->display, window_data_x11->window, &sizeHints);
+  XClearWindow (window_data_x11->display, window_data_x11->window);
+  XMapRaised (window_data_x11->display, window_data_x11->window);
+  XFlush (window_data_x11->display);
 
-  window_data_x11->gc = DefaultGC(window_data_x11->display, window_data_x11->screen);
+  window_data_x11->gc = DefaultGC (window_data_x11->display, window_data_x11->screen);
   window_data_x11->timer = mfb_timer_create();
 
-  mfb_set_keyboard_callback((struct mfb_window *) window_data, keyboard_default);
+  mfb_set_keyboard_callback ((struct mfb_window *) window_data, keyboard_default);
 
   #if defined(_DEBUG) || defined(DEBUG)
     printf("Window created using X11 API\n");
