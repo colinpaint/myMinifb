@@ -388,7 +388,7 @@ void destroy_window_data(SWindowData *window_data);
 //{{{
 mfb_update_state mfb_update_ex (struct mfb_window *window, void *buffer, unsigned width, unsigned height) {
 
-  #if (window == 0x0)
+  if (window == 0x0)
     return STATE_INVALID_WINDOW;
 
   SWindowData* window_data = (SWindowData*)window;
