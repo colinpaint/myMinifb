@@ -1,4 +1,6 @@
+//{{{  includes
 #include <MiniFB.h>
+
 #include "MiniFB_internal.h"
 #include "MiniFB_enums.h"
 #include "WindowData.h"
@@ -19,11 +21,11 @@
 #include <linux/input-event-codes.h>
 
 #include <sys/mman.h>
+//}}}
 
 void init_keycodes();
-
-static void
-destroy_window_data(SWindowData *window_data)
+//{{{
+static void destroy_window_data(SWindowData *window_data)
 {
     if(window_data == 0x0)
         return;
@@ -37,9 +39,9 @@ destroy_window_data(SWindowData *window_data)
     memset(window_data, 0, sizeof(SWindowData));
     free(window_data);
 }
-
-static void
-destroy(SWindowData *window_data)
+//}}}
+//{{{
+static void destroy(SWindowData *window_data)
 {
     if(window_data == 0x0)
         return;
@@ -78,14 +80,15 @@ destroy(SWindowData *window_data)
     destroy_window_data(window_data);
     close(window_data_way->fd);
 }
+//}}}
 
+//{{{
 // This event provides a file descriptor to the client which can be memory-mapped
 // to provide a keyboard mapping description.
 // format: keymap format
 // fd:     keymap file descriptor
 // size:   keymap size, in bytes
-static void
-keyboard_keymap(void *data, struct wl_keyboard *keyboard, uint32_t format, int fd, uint32_t size)
+static void keyboard_keymap(void *data, struct wl_keyboard *keyboard, uint32_t format, int fd, uint32_t size)
 {
     kUnused(data);
     kUnused(keyboard);
@@ -93,13 +96,13 @@ keyboard_keymap(void *data, struct wl_keyboard *keyboard, uint32_t format, int f
     kUnused(fd);
     kUnused(size);
 }
-
+//}}}
+//{{{
 // Notification that this seat's keyboard focus is on a certain surface.
 // serial:  serial number of the enter event
 // surface: surface gaining keyboard focus
 // keys:    the currently pressed keys
-static void
-keyboard_enter(void *data, struct wl_keyboard *keyboard, uint32_t serial, struct wl_surface *surface, struct wl_array *keys)
+static void keyboard_enter(void *data, struct wl_keyboard *keyboard, uint32_t serial, struct wl_surface *surface, struct wl_array *keys)
 {
     kUnused(keyboard);
     kUnused(serial);
@@ -110,12 +113,12 @@ keyboard_enter(void *data, struct wl_keyboard *keyboard, uint32_t serial, struct
     window_data->is_active = true;
     kCall(active_func, true);
 }
-
+//}}}
+//{{{
 // The leave notification is sent before the enter notification for the new focus.
 // serial:  serial number of the leave event
 // surface: surface that lost keyboard focus
-static void
-keyboard_leave(void *data, struct wl_keyboard *keyboard, uint32_t serial, struct wl_surface *surface)
+static void keyboard_leave(void *data, struct wl_keyboard *keyboard, uint32_t serial, struct wl_surface *surface)
 {
     kUnused(keyboard);
     kUnused(serial);
@@ -125,15 +128,15 @@ keyboard_leave(void *data, struct wl_keyboard *keyboard, uint32_t serial, struct
     window_data->is_active = false;
     kCall(active_func, false);
 }
-
+//}}}
+//{{{
 // A key was pressed or released. The time argument is a timestamp with
 // millisecond granularity, with an undefined base.
 // serial: serial number of the key event
 // time:   timestamp with millisecond granularity
 // key:    key that produced the event
 // state:  physical state of the key
-static void
-keyboard_key(void *data, struct wl_keyboard *keyboard, uint32_t serial, uint32_t time, uint32_t key, uint32_t state)
+static void keyboard_key(void *data, struct wl_keyboard *keyboard, uint32_t serial, uint32_t time, uint32_t key, uint32_t state)
 {
     kUnused(keyboard);
     kUnused(serial);
@@ -182,7 +185,8 @@ keyboard_key(void *data, struct wl_keyboard *keyboard, uint32_t serial, uint32_t
         kCall(keyboard_func, key_code, (mfb_key_mod) window_data->mod_keys, is_pressed);
     }
 }
-
+//}}}
+//{{{
 // Notifies clients that the modifier and/or group state has changed,
 // and it should update its local state.
 // serial:         serial number of the modifiers event
@@ -190,8 +194,7 @@ keyboard_key(void *data, struct wl_keyboard *keyboard, uint32_t serial, uint32_t
 // mods_latched:   latched modifiers
 // mods_locked:    locked modifiers
 // group:          keyboard layout
-static void
-keyboard_modifiers(void *data, struct wl_keyboard *keyboard, uint32_t serial, uint32_t mods_depressed, uint32_t mods_latched, uint32_t mods_locked, uint32_t group)
+static void keyboard_modifiers(void *data, struct wl_keyboard *keyboard, uint32_t serial, uint32_t mods_depressed, uint32_t mods_latched, uint32_t mods_locked, uint32_t group)
 {
     kUnused(data);
     kUnused(keyboard);
@@ -202,21 +205,21 @@ keyboard_modifiers(void *data, struct wl_keyboard *keyboard, uint32_t serial, ui
     kUnused(group);
     // it is not easy to identify them here :(
 }
-
+//}}}
+//{{{
 // Informs the client about the keyboard's repeat rate and delay.
 // rate:  the rate of repeating keys in characters per second
 // delay: delay in milliseconds since key down until repeating starts
-static void
-keyboard_repeat_info(void *data, struct wl_keyboard *keyboard, int32_t rate, int32_t delay)
+static void keyboard_repeat_info(void *data, struct wl_keyboard *keyboard, int32_t rate, int32_t delay)
 {
     kUnused(data);
     kUnused(keyboard);
     kUnused(rate);
     kUnused(delay);
 }
-
-static const struct
-wl_keyboard_listener keyboard_listener = {
+//}}}
+//{{{
+static const struct wl_keyboard_listener keyboard_listener = {
     .keymap      = keyboard_keymap,
     .enter       = keyboard_enter,
     .leave       = keyboard_leave,
@@ -224,9 +227,9 @@ wl_keyboard_listener keyboard_listener = {
     .modifiers   = keyboard_modifiers,
     .repeat_info = 0x0,
 };
+//}}}
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+//{{{
 // Notification that this seat's pointer is focused on a certain surface.
 //
 // When a seat's focus enters a surface, the pointer image is
@@ -237,8 +240,7 @@ wl_keyboard_listener keyboard_listener = {
 // surface: surface entered by the pointer
 // sx:      surface-local x coordinate
 // sy:      surface-local y coordinate
-static void
-pointer_enter(void *data, struct wl_pointer *pointer, uint32_t serial, struct wl_surface *surface, wl_fixed_t sx, wl_fixed_t sy)
+static void pointer_enter(void *data, struct wl_pointer *pointer, uint32_t serial, struct wl_surface *surface, wl_fixed_t sx, wl_fixed_t sy)
 {
     //kUnused(pointer);
     //kUnused(serial);
@@ -260,15 +262,15 @@ pointer_enter(void *data, struct wl_pointer *pointer, uint32_t serial, struct wl
     wl_surface_commit(window_data_way->cursor_surface);
     //fprintf(stderr, "Pointer entered surface %p at %d %d\n", surface, sx, sy);
 }
-
+//}}}
+//{{{
 // Notification that this seat's pointer is no longer focused on a certain surface.
 //
 // The leave notification is sent before the enter notification for the new focus.
 //
 // serial:  serial number of the leave event
 // surface: surface left by the pointer
-static void
-pointer_leave(void *data, struct wl_pointer *pointer, uint32_t serial, struct wl_surface *surface)
+static void pointer_leave(void *data, struct wl_pointer *pointer, uint32_t serial, struct wl_surface *surface)
 {
     kUnused(data);
     kUnused(pointer);
@@ -277,7 +279,8 @@ pointer_leave(void *data, struct wl_pointer *pointer, uint32_t serial, struct wl
 
     //fprintf(stderr, "Pointer left surface %p\n", surface);
 }
-
+//}}}
+//{{{
 // Notification of pointer location change.
 //
 // The arguments sx and sy are the location relative to the focused surface.
@@ -285,8 +288,7 @@ pointer_leave(void *data, struct wl_pointer *pointer, uint32_t serial, struct wl
 // time:  timestamp with millisecond granularity
 // sx:    surface-local x coordinate
 // sy:    surface-local y coordinate
-static void
-pointer_motion(void *data, struct wl_pointer *pointer, uint32_t time, wl_fixed_t sx, wl_fixed_t sy)
+static void pointer_motion(void *data, struct wl_pointer *pointer, uint32_t time, wl_fixed_t sx, wl_fixed_t sy)
 {
     kUnused(pointer);
     kUnused(time);
@@ -297,7 +299,8 @@ pointer_motion(void *data, struct wl_pointer *pointer, uint32_t time, wl_fixed_t
     window_data->mouse_pos_y = sy >> 24;
     kCall(mouse_move_func, window_data->mouse_pos_x, window_data->mouse_pos_y);
 }
-
+//}}}
+//{{{
 // Mouse button click and release notifications.
 //
 // The location of the click is given by the last motion or enter
@@ -316,8 +319,7 @@ pointer_motion(void *data, struct wl_pointer *pointer, uint32_t time, wl_fixed_t
 // time:   timestamp with millisecond granularity
 // button: button that produced the event
 // state:  physical state of the button
-static void
-pointer_button(void *data, struct wl_pointer *pointer, uint32_t serial, uint32_t time, uint32_t button, uint32_t state)
+static void pointer_button(void *data, struct wl_pointer *pointer, uint32_t serial, uint32_t time, uint32_t button, uint32_t state)
 {
     kUnused(pointer);
     kUnused(serial);
@@ -328,7 +330,8 @@ pointer_button(void *data, struct wl_pointer *pointer, uint32_t serial, uint32_t
     window_data->mouse_button_status[(button - BTN_MOUSE + 1) & 0x07] = (state == 1);
     kCall(mouse_btn_func, (mfb_mouse_button) (button - BTN_MOUSE + 1), (mfb_key_mod) window_data->mod_keys, state == 1);
 }
-
+//}}}
+//{{{
 //  Scroll and other axis notifications.
 //
 //  For scroll events (vertical and horizontal scroll axes), the
@@ -349,8 +352,7 @@ pointer_button(void *data, struct wl_pointer *pointer, uint32_t serial, uint32_t
 //  time:  timestamp with millisecond granularity
 //  axis:  axis type
 //  value: length of vector in surface-local coordinate space
-static void
-pointer_axis(void *data, struct wl_pointer *pointer, uint32_t time, uint32_t axis, wl_fixed_t value)
+static void pointer_axis(void *data, struct wl_pointer *pointer, uint32_t time, uint32_t axis, wl_fixed_t value)
 {
     kUnused(pointer);
     kUnused(time);
@@ -367,38 +369,41 @@ pointer_axis(void *data, struct wl_pointer *pointer, uint32_t time, uint32_t axi
         kCall(mouse_wheel_func, (mfb_key_mod) window_data->mod_keys, window_data->mouse_wheel_x, 0.0f);
     }
 }
+//}}}
 
-static void
-frame(void *data, struct wl_pointer *pointer) {
+//{{{
+static void frame(void *data, struct wl_pointer *pointer) {
     kUnused(data);
     kUnused(pointer);
 }
+//}}}
 
-static void
-axis_source(void *data, struct wl_pointer *pointer, uint32_t axis_source) {
+//{{{
+static void axis_source(void *data, struct wl_pointer *pointer, uint32_t axis_source) {
     kUnused(data);
     kUnused(pointer);
     kUnused(axis_source);
 }
-
-static void
-axis_stop(void *data, struct wl_pointer *pointer, uint32_t time, uint32_t axis) {
+//}}}
+//{{{
+static void axis_stop(void *data, struct wl_pointer *pointer, uint32_t time, uint32_t axis) {
     kUnused(data);
     kUnused(pointer);
     kUnused(time);
     kUnused(axis);
 }
-
-static void
-axis_discrete(void *data, struct wl_pointer *pointer, uint32_t axis, int32_t discrete) {
+//}}}
+//{{{
+static void axis_discrete(void *data, struct wl_pointer *pointer, uint32_t axis, int32_t discrete) {
     kUnused(data);
     kUnused(pointer);
     kUnused(axis);
     kUnused(discrete);
 }
+//}}}
 
-static const struct
-wl_pointer_listener pointer_listener = {
+//{{{
+static const struct wl_pointer_listener pointer_listener = {
     .enter         = pointer_enter,
     .leave         = pointer_leave,
     .motion        = pointer_motion,
@@ -409,11 +414,10 @@ wl_pointer_listener pointer_listener = {
     .axis_stop     = 0x0,
     .axis_discrete = 0x0,
 };
+//}}}
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-static void
-seat_capabilities(void *data, struct wl_seat *seat, enum wl_seat_capability caps)
+//{{{
+static void seat_capabilities(void *data, struct wl_seat *seat, enum wl_seat_capability caps)
 {
     kUnused(data);
 
@@ -442,29 +446,25 @@ seat_capabilities(void *data, struct wl_seat *seat, enum wl_seat_capability caps
     }
 }
 
-static void
-seat_name(void *data, struct wl_seat *seat, const char *name) {
+static void seat_name(void *data, struct wl_seat *seat, const char *name) {
     kUnused(data);
     kUnused(seat);
     printf("Seat '%s'n", name);
 }
 
-static const struct
-wl_seat_listener seat_listener = {
+static const struct wl_seat_listener seat_listener = {
     .capabilities = seat_capabilities,
     .name         = 0x0,
 };
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+//}}}
+//{{{
 // pixel format description
 //
 // Informs the client about a valid pixel format that can be used
 // for buffers. Known formats include argb8888 and xrgb8888.
 //
 // format: buffer pixel format
-static void
-shm_format(void *data, struct wl_shm *shm, uint32_t format)
+static void shm_format(void *data, struct wl_shm *shm, uint32_t format)
 {
     kUnused(shm);
 
@@ -490,11 +490,10 @@ static const struct
 wl_shm_listener shm_listener = {
     .format = shm_format
 };
+//}}}
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-static void
-registry_global(void *data, struct wl_registry *registry, uint32_t id, char const *iface, uint32_t version)
+//{{{
+static void registry_global(void *data, struct wl_registry *registry, uint32_t id, char const *iface, uint32_t version)
 {
     kUnused(version);
 
@@ -526,22 +525,22 @@ registry_global(void *data, struct wl_registry *registry, uint32_t id, char cons
         }
     }
 }
-
-static const struct
-wl_registry_listener registry_listener = {
+//}}}
+//{{{
+static const struct wl_registry_listener registry_listener = {
     .global        = registry_global,
     .global_remove = 0x0,
 };
-
-static void
-handle_ping(void *data, struct wl_shell_surface *shell_surface, uint32_t serial)
+//}}}
+//{{{
+static void handle_ping(void *data, struct wl_shell_surface *shell_surface, uint32_t serial)
 {
     kUnused(data);
     wl_shell_surface_pong(shell_surface, serial);
 }
-
-static void
-handle_configure(void *data, struct wl_shell_surface *shell_surface, uint32_t edges, int32_t width, int32_t height)
+//}}}
+//{{{
+static void handle_configure(void *data, struct wl_shell_surface *shell_surface, uint32_t edges, int32_t width, int32_t height)
 {
     kUnused(data);
     kUnused(shell_surface);
@@ -549,24 +548,24 @@ handle_configure(void *data, struct wl_shell_surface *shell_surface, uint32_t ed
     kUnused(width);
     kUnused(height);
 }
-
-static void
-handle_popup_done(void *data, struct wl_shell_surface *shell_surface)
+//}}}
+//{{{
+static void handle_popup_done(void *data, struct wl_shell_surface *shell_surface)
 {
     kUnused(data);
     kUnused(shell_surface);
 }
-
+//}}}
+//{{{
 static const struct wl_shell_surface_listener shell_surface_listener = {
     handle_ping,
     handle_configure,
     handle_popup_done
 };
+//}}}
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-struct mfb_window *
-mfb_open_ex(const char *title, unsigned width, unsigned height, unsigned flags)
+//{{{
+struct mfb_window * mfb_open_ex(const char *title, unsigned width, unsigned height, unsigned flags)
 {
     SWindowData *window_data = (SWindowData *) malloc(sizeof(SWindowData));
     if(window_data == 0x0) {
@@ -677,30 +676,29 @@ out:
 
     return 0x0;
 }
-
+//}}}
+//{{{
 // done event
 //
 // Notify the client when the related request is done.
 //
 // callback_data: request-specific data for the callback
-static void
-frame_done(void *data, struct wl_callback *callback, uint32_t cookie)
+static void frame_done(void *data, struct wl_callback *callback, uint32_t cookie)
 {
     kUnused(cookie);
     wl_callback_destroy(callback);
 
     *(uint32_t *)data = 1;
 }
-
-static const struct
-wl_callback_listener frame_listener = {
+//}}}
+//{{{
+static const struct wl_callback_listener frame_listener = {
     .done = frame_done,
 };
+//}}}
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-mfb_update_state
-mfb_update_ex(struct mfb_window *window, void *buffer, unsigned width, unsigned height)
+//{{{
+mfb_update_state mfb_update_ex(struct mfb_window *window, void *buffer, unsigned width, unsigned height)
 {
     uint32_t done = 0;
 
@@ -773,11 +771,9 @@ mfb_update_ex(struct mfb_window *window, void *buffer, unsigned width, unsigned 
 
     return STATE_OK;
 }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-mfb_update_state
-mfb_update_events(struct mfb_window *window)
+//}}}
+//{{{
+mfb_update_state mfb_update_events(struct mfb_window *window)
 {
     if(window == 0x0) {
         return STATE_INVALID_WINDOW;
@@ -799,13 +795,11 @@ mfb_update_events(struct mfb_window *window)
 
     return STATE_OK;
 }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//}}}
 
 extern double   g_time_for_frame;
-
-bool
-mfb_wait_sync(struct mfb_window *window) {
+//{{{
+bool mfb_wait_sync(struct mfb_window *window) {
     if(window == 0x0) {
         return false;
     }
@@ -846,13 +840,11 @@ mfb_wait_sync(struct mfb_window *window) {
 
     return true;
 }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//}}}
 
 extern short int g_keycodes[512];
-
-void
-init_keycodes(void)
+//{{{
+void init_keycodes(void)
 {
     // Clear keys
     for (size_t i = 0; i < sizeof(g_keycodes) / sizeof(g_keycodes[0]); ++i)
@@ -976,11 +968,10 @@ init_keycodes(void)
     g_keycodes[KEY_KPEQUAL]    = KB_KEY_KP_EQUAL;
     g_keycodes[KEY_KPENTER]    = KB_KEY_KP_ENTER;
 }
+//}}}
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-bool
-mfb_set_viewport(struct mfb_window *window, unsigned offset_x, unsigned offset_y, unsigned width, unsigned height) {
+//{{{
+bool mfb_set_viewport(struct mfb_window *window, unsigned offset_x, unsigned offset_y, unsigned width, unsigned height) {
 
     SWindowData *window_data = (SWindowData *) window;
 
@@ -1000,11 +991,9 @@ mfb_set_viewport(struct mfb_window *window, unsigned offset_x, unsigned offset_y
 
     return false;
 }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void
-mfb_get_monitor_scale(struct mfb_window *window, float *scale_x, float *scale_y) {
+//}}}
+//{{{
+void mfb_get_monitor_scale(struct mfb_window *window, float *scale_x, float *scale_y) {
     float x = 96.0, y = 96.0;
 
     if(window != 0x0) {
@@ -1028,3 +1017,4 @@ mfb_get_monitor_scale(struct mfb_window *window, float *scale_x, float *scale_y)
         }
     }
 }
+//}}}

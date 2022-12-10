@@ -39,6 +39,7 @@ typedef struct {
 	float    mouse_wheel_x;
 	float    mouse_wheel_y;
 	uint8_t  mouse_button_status[8];
+
 	uint8_t  key_status[512];
 	uint32_t mod_keys;
 

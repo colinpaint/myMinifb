@@ -16,14 +16,14 @@ endif()
 # Sources
 set (SrcLib
      include/MiniFB.h include/MiniFB_cpp.h include/MiniFB_enums.h
-     src/MiniFB_common.c src/MiniFB_cpp.cpp src/MiniFB_internal.c src/MiniFB_internal.h
-     src/MiniFB_timer.c src/WindowData.h )
+     src/MiniFB_internal.h src/WindowData.h
+     src/MiniFB_common.c src/MiniFB_cpp.cpp src/MiniFB_internal.c src/MiniFB_timer.c)
 
 set (SrcGL src/gl/MiniFB_GL.h src/gl/MiniFB_GL.c )
 set (SrcWindows src/windows/WinMiniFB.c src/windows/WindowData_Win.h )
 set (SrcWayland src/wayland/WaylandMiniFB.c src/wayland/WindowData_Way.h src/MiniFB_linux.c )
 
-set (SrcX11 src/x11/X11MiniFB.c src/x11/WindowData_X11.h src/MiniFB_linux.c )
+set (SrcX11 src/x11/X11MiniFB.c src/x11/WindowData_X11.h src/MiniFB_linux.c)
 set (SrcMacOSX src/macosx/MacMiniFB.m src/macosx/OSXWindow.h src/macosx/OSXWindow.m src/macosx/OSXView.h
      src/macosx/OSXView.m src/macosx/OSXViewDelegate.h src/macosx/OSXViewDelegate.m src/macosx/WindowData_OSX.h )
 set (SrcIOS src/ios/WindowData_IOS.h src/ios/iOSMiniFB.m src/ios/iOSView.h src/ios/iOSView.m src/ios/iOSViewController.h
