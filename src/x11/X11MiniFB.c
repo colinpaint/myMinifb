@@ -40,25 +40,24 @@ struct mfb_window* mfb_open_ex (const char *title, unsigned width, unsigned heig
   Visual* visual;
 
   SWindowData *window_data = (SWindowData *) malloc(sizeof(SWindowData));
-  if (!window_data) {
-      return 0x0;
-  }
+  if (!window_data)
+    return 0x0;
   memset(window_data, 0, sizeof(SWindowData));
 
   SWindowData_X11 *window_data_x11 = (SWindowData_X11 *) malloc(sizeof(SWindowData_X11));
   if (!window_data_x11) {
-      free(window_data);
-      return 0x0;
-  }
-  memset(window_data_x11, 0, sizeof(SWindowData_X11));
+    free(window_data);
+    return 0x0;
+    }
+  memset (window_data_x11, 0, sizeof(SWindowData_X11));
   window_data->specific = window_data_x11;
 
   window_data_x11->display = XOpenDisplay(0);
   if (!window_data_x11->display) {
-      free(window_data);
-      free(window_data_x11);
-      return 0x0;
-  }
+    free(window_data);
+    free(window_data_x11);
+    return 0x0;
+    }
 
   init_keycodes(window_data_x11);
   XAutoRepeatOff(window_data_x11->display);
@@ -71,34 +70,30 @@ struct mfb_window* mfb_open_ex (const char *title, unsigned width, unsigned heig
 
   Window defaultRootWindow = DefaultRootWindow(window_data_x11->display);
 
-  for (i = 0; i < formatCount; ++i)
-  {
-      if (depth == formats[i].depth)
-      {
-          convDepth = formats[i].bits_per_pixel;
-          break;
+  for (i = 0; i < formatCount; ++i) {
+    if (depth == formats[i].depth) {
+      convDepth = formats[i].bits_per_pixel;
+      break;
       }
-  }
+    }
 
   XFree(formats);
 
   // We only support 32-bit right now
-  if (convDepth != 32)
-  {
-      XCloseDisplay(window_data_x11->display);
-      return 0x0;
-  }
+  if (convDepth != 32) {
+    XCloseDisplay (window_data_x11->display);
+    return 0x0;
+    }
 
   int screenWidth  = DisplayWidth(window_data_x11->display, window_data_x11->screen);
   int screenHeight = DisplayHeight(window_data_x11->display, window_data_x11->screen);
 
-  windowAttributes.border_pixel     = BlackPixel(window_data_x11->display, window_data_x11->screen);
-  windowAttributes.background_pixel = BlackPixel(window_data_x11->display, window_data_x11->screen);
-  windowAttributes.backing_store    = NotUseful;
+  windowAttributes.border_pixel = BlackPixel (window_data_x11->display, window_data_x11->screen);
+  windowAttributes.background_pixel = BlackPixel (window_data_x11->display, window_data_x11->screen);
+  windowAttributes.backing_store = NotUseful;
 
   int posX, posY;
   int windowWidth, windowHeight;
-
   window_data->window_width  = width;
   window_data->window_height = height;
   window_data->buffer_width  = width;
@@ -107,29 +102,28 @@ struct mfb_window* mfb_open_ex (const char *title, unsigned width, unsigned heig
   calc_dst_factor(window_data, width, height);
 
   if (flags & WF_FULLSCREEN_DESKTOP) {
-      posX         = 0;
-      posY         = 0;
-      windowWidth  = screenWidth;
-      windowHeight = screenHeight;
-  }
+    posX         = 0;
+    posY         = 0;
+    windowWidth  = screenWidth;
+    windowHeight = screenHeight;
+   }
   else {
-      posX         = (screenWidth  - width)  / 2;
-      posY         = (screenHeight - height) / 2;
-      windowWidth  = width;
-      windowHeight = height;
-  }
+    posX         = (screenWidth  - width)  / 2;
+    posY         = (screenHeight - height) / 2;
+    windowWidth  = width;
+    windowHeight = height;
+   }
 
-  window_data_x11->window = XCreateWindow(
-                  window_data_x11->display,
-                  defaultRootWindow,
-                  posX, posY,
-                  windowWidth, windowHeight,
-                  0,
-                  depth,
-                  InputOutput,
-                  visual,
-                  CWBackPixel | CWBorderPixel | CWBackingStore,
-                  &windowAttributes);
+  window_data_x11->window = XCreateWindow (window_data_x11->display,
+                                           defaultRootWindow,
+                                           posX, posY,
+                                           windowWidth, windowHeight,
+                                           0,
+                                           depth,
+                                           InputOutput,
+                                           visual,
+                                           CWBackPixel | CWBorderPixel | CWBackingStore,
+                                           &windowAttributes);
   if (!window_data_x11->window)
       return 0x0;
 
@@ -141,10 +135,10 @@ struct mfb_window* mfb_open_ex (const char *title, unsigned width, unsigned heig
       | EnterWindowMask | LeaveWindowMask
   );
 
-  XStoreName(window_data_x11->display, window_data_x11->window, title);
+  XStoreName (window_data_x11->display, window_data_x11->window, title);
 
   if (flags & WF_BORDERLESS) {
-      struct StyleHints {
+    struct StyleHints {
           unsigned long   flags;
           unsigned long   functions;
           unsigned long   decorations;
@@ -157,19 +151,19 @@ struct mfb_window* mfb_open_ex (const char *title, unsigned width, unsigned heig
           .inputMode   = 0,
           .status      = 0,
       };
-      Atom sh_p = XInternAtom(window_data_x11->display, "_MOTIF_WM_HINTS", True);
-      XChangeProperty(window_data_x11->display, window_data_x11->window, sh_p, sh_p, 32, PropModeReplace, (unsigned char*)&sh, 5);
-  }
+    Atom sh_p = XInternAtom(window_data_x11->display, "_MOTIF_WM_HINTS", True);
+    XChangeProperty(window_data_x11->display, window_data_x11->window, sh_p, sh_p, 32, PropModeReplace, (unsigned char*)&sh, 5);
+    }
 
   if (flags & WF_ALWAYS_ON_TOP) {
-      Atom sa_p = XInternAtom(window_data_x11->display, "_NET_WM_STATE_ABOVE", False);
-      XChangeProperty(window_data_x11->display, window_data_x11->window, XInternAtom(window_data_x11->display, "_NET_WM_STATE", False), XA_ATOM, 32, PropModeReplace, (unsigned char *)&sa_p, 1);
-  }
+    Atom sa_p = XInternAtom(window_data_x11->display, "_NET_WM_STATE_ABOVE", False);
+    XChangeProperty(window_data_x11->display, window_data_x11->window, XInternAtom(window_data_x11->display, "_NET_WM_STATE", False), XA_ATOM, 32, PropModeReplace, (unsigned char *)&sa_p, 1);
+    }
 
   if (flags & WF_FULLSCREEN) {
-      Atom sf_p = XInternAtom(window_data_x11->display, "_NET_WM_STATE_FULLSCREEN", True);
-      XChangeProperty(window_data_x11->display, window_data_x11->window, XInternAtom(window_data_x11->display, "_NET_WM_STATE", True), XA_ATOM, 32, PropModeReplace, (unsigned char*)&sf_p, 1);
-  }
+    Atom sf_p = XInternAtom(window_data_x11->display, "_NET_WM_STATE_FULLSCREEN", True);
+    XChangeProperty(window_data_x11->display, window_data_x11->window, XInternAtom(window_data_x11->display, "_NET_WM_STATE", True), XA_ATOM, 32, PropModeReplace, (unsigned char*)&sf_p, 1);
+    }
 
   sizeHints.flags      = PPosition | PMinSize | PMaxSize;
   sizeHints.x          = 0;
@@ -177,13 +171,13 @@ struct mfb_window* mfb_open_ex (const char *title, unsigned width, unsigned heig
   sizeHints.min_width  = width;
   sizeHints.min_height = height;
   if (flags & WF_RESIZABLE) {
-      sizeHints.max_width  = screenWidth;
-      sizeHints.max_height = screenHeight;
-  }
+    sizeHints.max_width  = screenWidth;
+    sizeHints.max_height = screenHeight;
+    }
   else {
-      sizeHints.max_width  = width;
-      sizeHints.max_height = height;
-  }
+    sizeHints.max_width  = width;
+    sizeHints.max_height = height;
+    }
 
   s_delete_window_atom = XInternAtom(window_data_x11->display, "WM_DELETE_WINDOW", False);
   XSetWMProtocols(window_data_x11->display, window_data_x11->window, &s_delete_window_atom, 1);
@@ -198,7 +192,6 @@ struct mfb_window* mfb_open_ex (const char *title, unsigned width, unsigned heig
   XFlush(window_data_x11->display);
 
   window_data_x11->gc = DefaultGC(window_data_x11->display, window_data_x11->screen);
-
   window_data_x11->timer = mfb_timer_create();
 
   mfb_set_keyboard_callback((struct mfb_window *) window_data, keyboard_default);
@@ -394,32 +387,31 @@ static void processEvents (SWindowData *window_data) {
 void destroy_window_data(SWindowData *window_data);
 //{{{
 mfb_update_state mfb_update_ex (struct mfb_window *window, void *buffer, unsigned width, unsigned height) {
-    if (window == 0x0) {
-        return STATE_INVALID_WINDOW;
+
+  #if (window == 0x0)
+    return STATE_INVALID_WINDOW;
+
+  SWindowData* window_data = (SWindowData*)window;
+  if (window_data->close) {
+    destroy_window_data (window_data);
+    return STATE_EXIT;
     }
 
-    SWindowData *window_data = (SWindowData *) window;
-    if (window_data->close) {
-        destroy_window_data(window_data);
-        return STATE_EXIT;
+  if (buffer == 0x0)
+    return STATE_INVALID_BUFFER;
+
+  if (window_data->buffer_width != width || window_data->buffer_height != height) {
+    window_data->buffer_width  = width;
+    window_data->buffer_stride = width * 4;
+    window_data->buffer_height = height;
     }
 
-    if (buffer == 0x0) {
-        return STATE_INVALID_BUFFER;
-    }
+  redraw_GL (window_data, buffer);
 
-    if(window_data->buffer_width != width || window_data->buffer_height != height) {
-        window_data->buffer_width  = width;
-        window_data->buffer_stride = width * 4;
-        window_data->buffer_height = height;
-    }
+  processEvents (window_data);
 
-    redraw_GL(window_data, buffer);
-
-    processEvents(window_data);
-
-    return STATE_OK;
-}
+  return STATE_OK;
+  }
 //}}}
 //{{{
 mfb_update_state mfb_update_events (struct mfb_window *window) {
