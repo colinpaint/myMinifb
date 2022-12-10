@@ -12,6 +12,8 @@ set (SrcLib
 set (SrcGL src/gl/MiniFB_GL.h src/gl/MiniFB_GL.c )
 set (SrcWindows src/windows/WinMiniFB.c src/windows/WindowData_Win.h )
 set (SrcWayland src/wayland/WaylandMiniFB.c src/wayland/WindowData_Way.h src/MiniFB_linux.c )
+set (SrcX11 src/x11/X11MiniFB.c src/x11/WindowData_X11.h src/MiniFB_linux.c
+)
 
 # Avoid RelWithDebInfo and MinSizeRel
 set (CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
