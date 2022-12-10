@@ -13,11 +13,10 @@
 //{{{  defines
 // Copied (and modified) from Windows Kit 10 to avoid setting _WIN32_WINNT to a higher version
 typedef enum mfb_PROCESS_DPI_AWARENESS {
-  mfb_PROCESS_DPI_UNAWARE           = 0,
-  mfb_PROCESS_SYSTEM_DPI_AWARE      = 1,
+  mfb_PROCESS_DPI_UNAWARE = 0,
+  mfb_PROCESS_SYSTEM_DPI_AWARE = 1,
   mfb_PROCESS_PER_MONITOR_DPI_AWARE = 2
-  mfb_PROCESS_DPI_AWARENESS;
-  };
+} mfb_PROCESS_DPI_AWARENESS;
 
 typedef enum mfb_MONITOR_DPI_TYPE {
   mfb_MDT_EFFECTIVE_DPI             = 0,
