@@ -6,9 +6,10 @@
 short int g_keycodes[512] = { 0 };
 
 //{{{
-struct mfb_window * mfb_open(const char *title, unsigned width, unsigned height) {
-    return mfb_open_ex(title, width, height, 0);
-}
+struct mfb_window * mfb_open (const char *title, unsigned width, unsigned height) {
+
+  return mfb_open_ex (title, width, height, 0);
+  }
 //}}}
 
 //{{{

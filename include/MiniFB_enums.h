@@ -1,9 +1,9 @@
 #pragma once
-
 #include <stdint.h>
 #include <stdbool.h>
 
 // Enums
+//{{{  mfb_update_state
 typedef enum {
     STATE_OK             =  0,
     STATE_EXIT           = -1,
@@ -11,7 +11,9 @@ typedef enum {
     STATE_INVALID_BUFFER = -3,
     STATE_INTERNAL_ERROR = -4,
 } mfb_update_state;
+//}}}
 
+//{{{  mfb_mouse_button
 typedef enum {
     MOUSE_BTN_0, // No mouse button
     MOUSE_BTN_1,
@@ -22,10 +24,12 @@ typedef enum {
     MOUSE_BTN_6,
     MOUSE_BTN_7,
 } mfb_mouse_button;
+//}}}
 #define MOUSE_LEFT   MOUSE_BTN_1
 #define MOUSE_RIGHT  MOUSE_BTN_2
 #define MOUSE_MIDDLE MOUSE_BTN_3
 
+//{{{  mfb_key
 typedef enum {
     KB_KEY_UNKNOWN       = -1,
 
@@ -151,8 +155,10 @@ typedef enum {
     KB_KEY_RIGHT_SUPER   = 347,
     KB_KEY_MENU          = 348
 } mfb_key;
+//}}}
 #define KB_KEY_LAST     KB_KEY_MENU
 
+//{{{  mfb_key_mod
 typedef enum {
     KB_MOD_SHIFT        = 0x0001,
     KB_MOD_CONTROL      = 0x0002,
@@ -161,7 +167,8 @@ typedef enum {
     KB_MOD_CAPS_LOCK    = 0x0010,
     KB_MOD_NUM_LOCK     = 0x0020
 } mfb_key_mod;
-
+//}}}
+//{{{  mfb_window_flags
 typedef enum {
     WF_RESIZABLE          = 0x01,
     WF_FULLSCREEN         = 0x02,
@@ -169,6 +176,7 @@ typedef enum {
     WF_BORDERLESS         = 0x08,
     WF_ALWAYS_ON_TOP      = 0x10,
 } mfb_window_flags;
+//}}}
 
 // Opaque pointer
 struct mfb_window;
@@ -183,4 +191,3 @@ typedef void(*mfb_char_input_func)(struct mfb_window *window, unsigned int code)
 typedef void(*mfb_mouse_button_func)(struct mfb_window *window, mfb_mouse_button button, mfb_key_mod mod, bool isPressed);
 typedef void(*mfb_mouse_move_func)(struct mfb_window *window, int x, int y);
 typedef void(*mfb_mouse_scroll_func)(struct mfb_window *window, mfb_key_mod mod, float deltaX, float deltaY);
-

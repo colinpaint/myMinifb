@@ -1,6 +1,7 @@
-//{{{
+//{{{  includes
 #include <MiniFB.h>
 #include <MiniFB_internal.h>
+
 #include <WindowData.h>
 #include "WindowData_Win.h"
 
@@ -77,7 +78,7 @@ void load_functions() {
 //}}}
 //{{{
 // NOT Thread safe. Just convenient (Don't do this at home guys)
-char * GetErrorMessage() {
+char* GetErrorMessage() {
     static char buffer[256];
 
     buffer[0] = 0;
@@ -152,7 +153,7 @@ void get_monitor_scale(HWND hWnd, float *scale_x, float *scale_y) {
 }
 //}}}
 //{{{
-void mfb_get_monitor_scale (struct mfb_window *window, float *scale_x, float *scale_y) {
+void mfb_get_monitor_scale (struct mfb_window* window, float* scale_x, float* scale_y) {
     HWND hWnd = 0x0;
 
     if(window != 0x0) {
@@ -164,12 +165,12 @@ void mfb_get_monitor_scale (struct mfb_window *window, float *scale_x, float *sc
 }
 //}}}
 
-long    s_window_style = WS_POPUP | WS_SYSMENU | WS_CAPTION;
+long s_window_style = WS_POPUP | WS_SYSMENU | WS_CAPTION;
 
 void init_keycodes();
 uint32_t translate_mod();
 mfb_key  translate_key (unsigned int wParam, unsigned long lParam);
-void destroy_window_data (SWindowData *window_data);
+void destroy_window_data (SWindowData* window_data);
 //{{{
 LRESULT CALLBACK WndProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 
@@ -467,7 +468,7 @@ LRESULT CALLBACK WndProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 //}}}
 
 //{{{
-struct mfb_window * mfb_open_ex (const char *title, unsigned width, unsigned height, unsigned flags) {
+struct mfb_window* mfb_open_ex (const char* title, unsigned width, unsigned height, unsigned flags) {
 
   RECT rect = { 0 };
   int  x = 0, y = 0;
@@ -477,13 +478,12 @@ struct mfb_window * mfb_open_ex (const char *title, unsigned width, unsigned hei
   init_keycodes();
 
   SWindowData *window_data = malloc(sizeof(SWindowData));
-  if (window_data == 0x0) {
-      return 0x0;
-  }
-  memset(window_data, 0, sizeof(SWindowData));
+  if (window_data == 0x0) 
+    return 0x0;
+  memset (window_data, 0, sizeof(SWindowData));
 
   SWindowData_Win *window_data_win = malloc(sizeof(SWindowData_Win));
-  if(window_data_win == 0x0) {
+  if (window_data_win == 0x0) {
     free(window_data);
     return 0x0;
     }
@@ -508,28 +508,25 @@ struct mfb_window * mfb_open_ex (const char *title, unsigned width, unsigned hei
     settings.dmBitsPerPel = 32;
     settings.dmFields     = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
 
-    if (ChangeDisplaySettings(&settings, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL) {
-        flags = WF_FULLSCREEN_DESKTOP;
-      }
+    if (ChangeDisplaySettings(&settings, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
+      flags = WF_FULLSCREEN_DESKTOP;
     }
 
-  if (flags & WF_BORDERLESS) {
+  if (flags & WF_BORDERLESS) 
     s_window_style = WS_POPUP;
-    }
 
-  if (flags & WF_RESIZABLE) {
+  if (flags & WF_RESIZABLE) 
     s_window_style |= WS_MAXIMIZEBOX | WS_SIZEBOX;
-    }
 
   if (flags & WF_FULLSCREEN_DESKTOP) {
     s_window_style = WS_OVERLAPPEDWINDOW;
 
-    width  = GetSystemMetrics(SM_CXFULLSCREEN);
-    height = GetSystemMetrics(SM_CYFULLSCREEN);
+    width  = GetSystemMetrics (SM_CXFULLSCREEN);
+    height = GetSystemMetrics (SM_CYFULLSCREEN);
 
     rect.right  = width;
     rect.bottom = height;
-    AdjustWindowRect(&rect, s_window_style, 0);
+    AdjustWindowRect (&rect, s_window_style, 0);
     if (rect.left < 0) {
         width += rect.left * 2;
         rect.right += rect.left;
@@ -543,17 +540,14 @@ struct mfb_window * mfb_open_ex (const char *title, unsigned width, unsigned hei
     }
   else if (!(flags & WF_FULLSCREEN)) {
     float scale_x, scale_y;
-
     get_monitor_scale(0, &scale_x, &scale_y);
 
     rect.right  = (LONG) (width  * scale_x);
     rect.bottom = (LONG) (height * scale_y);
-
     AdjustWindowRect(&rect, s_window_style, 0);
 
     rect.right  -= rect.left;
     rect.bottom -= rect.top;
-
     x = (GetSystemMetrics(SM_CXSCREEN) - rect.right) / 2;
     y = (GetSystemMetrics(SM_CYSCREEN) - rect.bottom + rect.top) / 2;
     }
@@ -562,9 +556,9 @@ struct mfb_window * mfb_open_ex (const char *title, unsigned width, unsigned hei
   window_data_win->wc.lpfnWndProc   = WndProc;
   window_data_win->wc.hCursor       = LoadCursor(0, IDC_ARROW);
   window_data_win->wc.lpszClassName = title;
-  RegisterClass(&window_data_win->wc);
+  RegisterClass (&window_data_win->wc);
 
-  calc_dst_factor(window_data, width, height);
+  calc_dst_factor (window_data, width, height);
 
   window_data->window_width  = rect.right;
   window_data->window_height = rect.bottom;
@@ -581,16 +575,15 @@ struct mfb_window * mfb_open_ex (const char *title, unsigned width, unsigned hei
     return 0x0;
     }
 
-  SetWindowLongPtr(window_data_win->window, GWLP_USERDATA, (LONG_PTR) window_data);
+  SetWindowLongPtr (window_data_win->window, GWLP_USERDATA, (LONG_PTR) window_data);
 
   if (flags & WF_ALWAYS_ON_TOP)
-    SetWindowPos(window_data_win->window, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-
-  ShowWindow(window_data_win->window, SW_NORMAL);
+    SetWindowPos (window_data_win->window, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+  ShowWindow (window_data_win->window, SW_NORMAL);
 
   window_data_win->hdc = GetDC (window_data_win->window);
 
-  #if !defined(USE_OPENGL_API)
+  #if !defined (USE_OPENGL_API)
     window_data_win->bitmapInfo = (BITMAPINFO *) calloc(1, sizeof(BITMAPINFOHEADER) + sizeof(RGBQUAD) * 3);
     if(window_data_win->bitmapInfo == 0x0) {
       free(window_data);
@@ -617,9 +610,9 @@ struct mfb_window * mfb_open_ex (const char *title, unsigned width, unsigned hei
 
   #if defined(_DEBUG) || defined(DEBUG)
     #if defined(USE_OPENGL_API)
-        printf("Window created using OpenGL API\n");
+      printf("Window created using OpenGL API\n");
     #else
-        printf("Window created using GDI API\n");
+      printf("Window created using GDI API\n");
     #endif
   #endif
 
@@ -628,41 +621,39 @@ struct mfb_window * mfb_open_ex (const char *title, unsigned width, unsigned hei
   }
 //}}}
 //{{{
-mfb_update_state mfb_update_ex (struct mfb_window *window, void *buffer, unsigned width, unsigned height) {
+mfb_update_state mfb_update_ex (struct mfb_window* window, void* buffer, unsigned width, unsigned height) {
 
   MSG msg;
 
-  if (window == 0x0) {
+  if (window == 0x0) 
     return STATE_INVALID_WINDOW;
-    }
 
-  SWindowData *window_data = (SWindowData *) window;
+  SWindowData* window_data = (SWindowData*) window;
   if (window_data->close) {
-    destroy_window_data(window_data);
+    destroy_window_data (window_data);
     return STATE_EXIT;
     }
 
-  if (buffer == 0x0) {
+  if (buffer == 0x0) 
     return STATE_INVALID_BUFFER;
-    }
 
-  window_data->draw_buffer   = buffer;
-  window_data->buffer_width  = width;
+  window_data->draw_buffer = buffer;
+  window_data->buffer_width = width;
   window_data->buffer_stride = width * 4;
   window_data->buffer_height = height;
 
-  SWindowData_Win *window_data_win = (SWindowData_Win *) window_data->specific;
+  SWindowData_Win* window_data_win = (SWindowData_Win*) window_data->specific;
 
   #if !defined (USE_OPENGL_API)
     window_data_win->bitmapInfo->bmiHeader.biWidth = window_data->buffer_width;
-    window_data_win->bitmapInfo->bmiHeader.biHeight = -(LONG) window_data->buffer_height;
-    InvalidateRect(window_data_win->window, 0x0, TRUE);
-    SendMessage(window_data_win->window, WM_PAINT, 0, 0);
+    window_data_win->bitmapInfo->bmiHeader.biHeight = -(LONG)window_data->buffer_height;
+    InvalidateRect (window_data_win->window, 0x0, TRUE);
+    SendMessage (window_data_win->window, WM_PAINT, 0, 0);
   #else
-    redraw_GL(window_data, buffer);
+    redraw_GL (window_data, buffer);
   #endif
 
-  while (window_data->close == false && PeekMessage(&msg, window_data_win->window, 0, 0, PM_REMOVE)) {
+  while (window_data->close == false && PeekMessage (&msg, window_data_win->window, 0, 0, PM_REMOVE)) {
     TranslateMessage (&msg);
     DispatchMessage (&msg);
     }
@@ -671,36 +662,35 @@ mfb_update_state mfb_update_ex (struct mfb_window *window, void *buffer, unsigne
   }
 //}}}
 //{{{
-mfb_update_state mfb_update_events (struct mfb_window *window) {
+mfb_update_state mfb_update_events (struct mfb_window* window) {
 
   MSG msg;
 
-  if (window == 0x0) {
+  if (window == 0x0)
     return STATE_INVALID_WINDOW;
-    }
 
-  SWindowData *window_data = (SWindowData *)window;
+  SWindowData *window_data = (SWindowData*)window;
   if (window_data->close) {
     destroy_window_data(window_data);
     return STATE_EXIT;
     }
 
-  SWindowData_Win *window_data_win = (SWindowData_Win *) window_data->specific;
-  while (window_data->close == false && PeekMessage(&msg, window_data_win->window, 0, 0, PM_REMOVE)) {
+  SWindowData_Win *window_data_win = (SWindowData_Win*)window_data->specific;
+  while (window_data->close == false && PeekMessage (&msg, window_data_win->window, 0, 0, PM_REMOVE)) {
     //if(msg.message == WM_PAINT)
     //    return STATE_OK;
-    TranslateMessage(&msg);
-    DispatchMessage(&msg);
+    TranslateMessage (&msg);
+    DispatchMessage (&msg);
     }
 
   return STATE_OK;
   }
 //}}}
 
-extern double   g_time_for_frame;
-extern bool     g_use_hardware_sync;
+extern double g_time_for_frame;
+extern bool g_use_hardware_sync;
 //{{{
-bool mfb_wait_sync (struct mfb_window *window) {
+bool mfb_wait_sync (struct mfb_window* window) {
 
   if (window == 0x0) {
     return false;
@@ -747,7 +737,7 @@ bool mfb_wait_sync (struct mfb_window *window) {
   }
 //}}}
 //{{{
-void destroy_window_data (SWindowData *window_data) {
+void destroy_window_data (SWindowData* window_data) {
 
   if (window_data == 0x0)
     return;
@@ -940,7 +930,7 @@ mfb_key translate_key (unsigned int wParam, unsigned long lParam) {
 
     time = GetMessageTime();
     if (PeekMessageW (&next, 0x0, 0, 0, PM_NOREMOVE))
-      if (next.message == WM_KEYDOWN || next.message == WM_SYSKEYDOWN || 
+      if (next.message == WM_KEYDOWN || next.message == WM_SYSKEYDOWN ||
           next.message == WM_KEYUP || next.message == WM_SYSKEYUP)
         if (next.wParam == VK_MENU && (next.lParam & 0x01000000) && next.time == time)
           return KB_KEY_UNKNOWN;
@@ -956,7 +946,7 @@ mfb_key translate_key (unsigned int wParam, unsigned long lParam) {
 //}}}
 
 //{{{
-bool mfb_set_viewport (struct mfb_window *window, unsigned offset_x, unsigned offset_y, unsigned width, unsigned height) {
+bool mfb_set_viewport (struct mfb_window* window, unsigned offset_x, unsigned offset_y, unsigned width, unsigned height) {
 
   SWindowData     *window_data     = (SWindowData *) window;
   SWindowData_Win *window_data_win = 0x0;
@@ -993,22 +983,21 @@ bool mfb_set_viewport (struct mfb_window *window, unsigned offset_x, unsigned of
   }
 //}}}
 
-extern double   g_timer_frequency;
-extern double   g_timer_resolution;
+extern double g_timer_frequency;
+extern double g_timer_resolution;
 //{{{
 uint64_t mfb_timer_tick() {
 
-  int64_t     counter;
-  QueryPerformanceCounter((LARGE_INTEGER *) &counter);
+  int64_t counter;
+  QueryPerformanceCounter ((LARGE_INTEGER*) &counter);
   return counter;
   }
 //}}}
 //{{{
 void mfb_timer_init() {
 
-  uint64_t    frequency;
-
-  QueryPerformanceFrequency((LARGE_INTEGER *) &frequency);
+  uint64_t frequency;
+  QueryPerformanceFrequency ((LARGE_INTEGER*)&frequency);
 
   g_timer_frequency  = (double) ((int64_t) frequency);
   g_timer_resolution = 1.0 / g_timer_frequency;

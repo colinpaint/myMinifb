@@ -3,16 +3,6 @@ set (PROJECT_NAME MiniFB)
 project (${PROJECT_NAME})
 message(STATUS "Processing " ${PROJECT_NAME})
 
-# Detect iOS
-if(NOT DEFINED IOS)
-  if(DEFINED CMAKE_SYSTEM_NAME)
-    string(TOLOWER CMAKE_SYSTEM_NAME CMAKE_SYSTEM_NAME_LOWER)
-    if(CMAKE_SYSTEM_NAME_LOWER STREQUAL "ios")
-      set(IOS true)
-    endif()
-  endif()
-endif()
-
 # Sources
 set (SrcLib
      include/MiniFB.h include/MiniFB_cpp.h include/MiniFB_enums.h
@@ -22,12 +12,6 @@ set (SrcLib
 set (SrcGL src/gl/MiniFB_GL.h src/gl/MiniFB_GL.c )
 set (SrcWindows src/windows/WinMiniFB.c src/windows/WindowData_Win.h )
 set (SrcWayland src/wayland/WaylandMiniFB.c src/wayland/WindowData_Way.h src/MiniFB_linux.c )
-
-set (SrcX11 src/x11/X11MiniFB.c src/x11/WindowData_X11.h src/MiniFB_linux.c)
-set (SrcMacOSX src/macosx/MacMiniFB.m src/macosx/OSXWindow.h src/macosx/OSXWindow.m src/macosx/OSXView.h
-     src/macosx/OSXView.m src/macosx/OSXViewDelegate.h src/macosx/OSXViewDelegate.m src/macosx/WindowData_OSX.h )
-set (SrcIOS src/ios/WindowData_IOS.h src/ios/iOSMiniFB.m src/ios/iOSView.h src/ios/iOSView.m src/ios/iOSViewController.h
-     src/ios/iOSViewController.m src/ios/iOSViewDelegate.h src/ios/iOSViewDelegate.m include/MiniFB_ios.h )
 
 # Avoid RelWithDebInfo and MinSizeRel
 set (CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
@@ -48,10 +32,7 @@ set_property (GLOBAL PROPERTY USE_FOLDERS ON)
 option (MINIFB_BUILD_EXAMPLES "Build minifb example programs" TRUE)
 option (MINIFB_AVOID_CPP_HEADERS "Avoid including C++ Headers" FALSE)
 
-if (APPLE AND NOT IOS)
-  option (USE_METAL_API "Build the project using metal API code" ON)
-  option (USE_INVERTED_Y_ON_MACOS "Use default mouse position: (0, 0) at (left, down)" OFF)
-elseif (UNIX)
+if (UNIX)
   option (USE_WAYLAND_API "Build the project using wayland API code" OFF)
   if (NOT USE_WAYLAND_API)
     option (USE_OPENGL_API "Build the project using OpenGL API code" ON)
@@ -85,9 +66,7 @@ if(NOT MSVC)
   add_compile_options (-Wall -Wextra)
   add_compile_options (-Wno-switch -Wno-unused-function -Wno-unused-parameter -Wno-implicit-fallthrough)
 
-  if(NOT APPLE)
-    add_compile_options (-Wno-cast-function-type)
-  endif()
+  add_compile_options (-Wno-cast-function-type)
 
 else()
   # Security check
@@ -145,21 +124,6 @@ if(WIN32)
   endif()
 
   list (APPEND SrcLib ${SrcWindows})
-
-elseif(IOS)
-  list (APPEND SrcLib ${SrcIOS})
-
-elseif(APPLE)
-  if (USE_METAL_API)
-    add_definitions (-DUSE_METAL_API)
-  endif()
-
-  if (USE_INVERTED_Y_ON_MACOS)
-    add_definitions (-DUSE_INVERTED_Y_ON_MACOS)
-  endif()
-
-  list (APPEND SrcLib ${SrcMacOSX})
-
 elseif(UNIX)
   if (USE_WAYLAND_API)
     list (APPEND SrcLib ${SrcWayland})
@@ -176,14 +140,7 @@ endif()
 add_library (minifb STATIC ${SrcLib} )
 
 # Link
-if (APPLE)
-  if (IOS)
-    target_link_libraries (minifb "-framework UIKit" "-framework QuartzCore" "-framework Metal" "-framework MetalKit" )
-  else()
-   target_link_libraries (minifb "-framework Cocoa" "-framework QuartzCore" "-framework Metal" "-framework MetalKit" )
-  endif()
-
-elseif (UNIX)
+if (UNIX)
   if (USE_WAYLAND_API)
     target_link_libraries (minifb "-lwayland-client" "-lwayland-cursor")
   else()
@@ -194,7 +151,6 @@ elseif (UNIX)
       target_link_libraries (minifb "-lGL" )
     endif()
   endif()
-
 elseif(WIN32)
   if(USE_OPENGL_API)
     target_link_libraries (minifb "Opengl32.lib" )
@@ -205,24 +161,16 @@ endif()
 # For all projects
 target_include_directories (minifb PUBLIC  ${CMAKE_CURRENT_LIST_DIR}/include)
 target_include_directories (minifb PRIVATE src)
-link_libraries(minifb)
+link_libraries (minifb)
 
 # Examples
 if(MINIFB_BUILD_EXAMPLES)
-  if(NOT IOS)
-    add_executable (noise tests/noise.c )
-    add_executable (input_events tests/input_events.c )
-    add_executable (input_events_cpp tests/input_events_cpp.cpp )
-    add_executable (multiple_windows tests/multiple_windows.c )
-    add_executable (hidpi tests/hidpi.c )
-    add_executable (fullscreen tests/fullscreen.c )
-  else()
-    add_executable (noise tests/ios/main.m tests/ios/AppDelegate.h tests/ios/AppDelegate.m )
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0" CACHE STRING "Set CMake deployment target" ${FORCE_CACHE})
-    target_include_directories (noise PRIVATE src)
-    target_include_directories (noise PRIVATE src/ios)
-    add_definitions (-DTVOS_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET})
-  endif()
+  add_executable (noise tests/noise.c )
+  add_executable (input_events tests/input_events.c )
+  add_executable (input_events_cpp tests/input_events_cpp.cpp )
+  add_executable (multiple_windows tests/multiple_windows.c )
+  add_executable (hidpi tests/hidpi.c )
+  add_executable (fullscreen tests/fullscreen.c )
 endif()
 
 # Organize IDE Folders
