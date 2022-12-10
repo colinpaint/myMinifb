@@ -8,17 +8,18 @@
 
 #define WIDTH  60
 #define HEIGHT 640
+
 static unsigned int g_buffer[WIDTH * HEIGHT];
 static bool g_active = true;
 
 int main() {
   int noise, carry, seed = 0xbeef;
 
-  struct mfb_window *window = mfb_open_ex("full screen auto", WIDTH, HEIGHT, WF_FULLSCREEN);
+  struct mfb_window *window = mfb_open_ex ("full screen auto", WIDTH, HEIGHT, WF_FULLSCREEN);
   if (!window)
     return 0;
 
-  mfb_set_viewport_best_fit(window, WIDTH, HEIGHT);
+  mfb_set_viewport_best_fit (window, WIDTH, HEIGHT);
 
   do {
     int              i;
