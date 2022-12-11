@@ -26,7 +26,6 @@ set (CMAKE_CXX_STANDARD 11)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
 set (CMAKE_CXX_EXTENSIONS OFF)
 set_property (GLOBAL PROPERTY USE_FOLDERS ON)
-set_property (TARGET minifb PROPERTY FOLDER "Libs")
 
 # Code generation options
 option (MINIFB_BUILD_EXAMPLES "Build minifb example programs" TRUE)
@@ -157,6 +156,8 @@ endif()
 target_include_directories (minifb PUBLIC ${CMAKE_CURRENT_LIST_DIR}/include)
 target_include_directories (minifb PRIVATE src)
 link_libraries (minifb)
+
+set_property (TARGET minifb PROPERTY FOLDER "Libs")
 
 # Examples
 if (MINIFB_BUILD_EXAMPLES)

@@ -22,7 +22,7 @@ int main() {
     } , window);
   mfb_set_resize_callback ([](struct mfb_window* window, int width, int height) {
     //{{{  lambda
-    fprintf (stdout, "%s > resize: %d, %d\n", window ? (const char*) mfb_get_user_data(window) : "", width, height);
+    fprintf (stdout, "%s > resize: %d, %d\n", window ? (const char*)mfb_get_user_data(window) : "", width, height);
 
     uint32_t x = 0;
     if (width > WIDTH) {
@@ -42,7 +42,7 @@ int main() {
   mfb_set_close_callback ([](struct mfb_window* window) {
     //{{{  lambda
     fprintf (stdout, "%s > close\n", window ? (const char*) mfb_get_user_data(window) : "");
-    return true; // flase for don't close   
+    return true; // flase for don't close
     //}}}
     }, window);
 
@@ -61,8 +61,8 @@ int main() {
   // mouse
   mfb_set_mouse_button_callback ([](struct mfb_window* window, mfb_mouse_button button, mfb_key_mod mod, bool isPressed) {
     //{{{  lambda
-    fprintf (stdout, "%s > mouse_button: button: %d (pressed: %d) (at: %d, %d) [key_mod: %x]\n", 
-             window ? (const char*) mfb_get_user_data(window) : "", button, isPressed, 
+    fprintf (stdout, "%s > mouse_button: button: %d (pressed: %d) (at: %d, %d) [key_mod: %x]\n",
+             window ? (const char*) mfb_get_user_data(window) : "", button, isPressed,
              mfb_get_mouse_x (window), mfb_get_mouse_y (window), mod);
     //}}}
     }, window);
@@ -71,7 +71,7 @@ int main() {
     }, window);
   mfb_set_mouse_scroll_callback ([](struct mfb_window* window, mfb_key_mod mod, float deltaX, float deltaY) {
     //{{{  lambda
-    fprintf (stdout, "%s > mouse_scroll: x: %f, y: %f [key_mod: %x]\n", 
+    fprintf (stdout, "%s > mouse_scroll: x: %f, y: %f [key_mod: %x]\n",
              window ? (const char*) mfb_get_user_data(window) : "", deltaX, deltaY, mod);
     //}}}
     }, window);
@@ -87,6 +87,7 @@ int main() {
       seed >>= 1;
       seed |= (carry << 30);
       noise &= 0xFF;
+
       g_buffer[i] = MFB_RGB(noise, noise, noise);
       }
     //}}}
