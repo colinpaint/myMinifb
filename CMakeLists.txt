@@ -4,16 +4,13 @@ project (${PROJECT_NAME})
 message(STATUS "Processing " ${PROJECT_NAME})
 
 # Sources
-set (SrcLib
-     include/MiniFB.h include/MiniFB_cpp.h include/MiniFB_enums.h
-     src/MiniFB_internal.h src/WindowData.h
-     src/MiniFB_common.c src/MiniFB_cpp.cpp src/MiniFB_internal.c src/MiniFB_timer.c)
-
+set (SrcLib include/MiniFB.h include/MiniFB_cpp.h include/MiniFB_enums.h
+            src/MiniFB_internal.h src/WindowData.h
+            src/MiniFB_common.c src/MiniFB_cpp.cpp src/MiniFB_internal.c src/MiniFB_timer.c)
 set (SrcGL src/gl/MiniFB_GL.h src/gl/MiniFB_GL.c )
 set (SrcWindows src/windows/WinMiniFB.c src/windows/WindowData_Win.h )
 set (SrcWayland src/wayland/WaylandMiniFB.c src/wayland/WindowData_Way.h src/MiniFB_linux.c )
-set (SrcX11 src/x11/X11MiniFB.c src/x11/WindowData_X11.h src/MiniFB_linux.c
-)
+set (SrcX11 src/x11/X11MiniFB.c src/x11/WindowData_X11.h src/MiniFB_linux.c)
 
 # Avoid RelWithDebInfo and MinSizeRel
 set (CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
@@ -29,6 +26,7 @@ set (CMAKE_CXX_STANDARD 11)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
 set (CMAKE_CXX_EXTENSIONS OFF)
 set_property (GLOBAL PROPERTY USE_FOLDERS ON)
+set_property (TARGET minifb PROPERTY FOLDER "Libs")
 
 # Code generation options
 option (MINIFB_BUILD_EXAMPLES "Build minifb example programs" TRUE)
@@ -156,7 +154,7 @@ elseif (WIN32)
 endif()
 
 # For all projects
-target_include_directories (minifb PUBLIC  ${CMAKE_CURRENT_LIST_DIR}/include)
+target_include_directories (minifb PUBLIC ${CMAKE_CURRENT_LIST_DIR}/include)
 target_include_directories (minifb PRIVATE src)
 link_libraries (minifb)
 
@@ -167,13 +165,7 @@ if (MINIFB_BUILD_EXAMPLES)
   add_executable (fullscreen tests/fullscreen.c )
   add_executable (input_events_cpp tests/input_events_cpp.cpp )
   add_executable (multiple_windows tests/multiple_windows.cpp )
-endif()
 
-# Organize IDE Folders
-set_property (GLOBAL PROPERTY USE_FOLDERS ON)
-set_property (TARGET minifb PROPERTY FOLDER "Libs")
-
-if (MINIFB_BUILD_EXAMPLES)
   set_property (TARGET noise PROPERTY FOLDER "Tests")
   set_property (TARGET hidpi PROPERTY FOLDER "Tests")
   set_property (TARGET fullscreen PROPERTY FOLDER "Tests")
