@@ -7,8 +7,8 @@
     window_data->func ((struct mfb_window *) window_data, __VA_ARGS__);
 
 typedef struct mfb_timer {
-  int64_t  start_time;
-  int64_t  delta_counter;
+  int64_t start_time;
+  int64_t delta_counter;
   uint64_t time;
   } mfb_timer;
 

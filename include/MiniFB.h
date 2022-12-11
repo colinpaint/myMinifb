@@ -91,7 +91,8 @@ double mfb_timer_delta (struct mfb_timer *tmr);
 double mfb_timer_get_frequency();
 double mfb_timer_get_resolution();
 
+//{{{
 #ifdef __cplusplus
   }
-  #include "MiniFB_cpp.h"
 #endif
+//}}}

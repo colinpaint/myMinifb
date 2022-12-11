@@ -1,8 +1,8 @@
 #pragma once
-#include <functional>
 #include "MiniFB.h"
+#include <functional>
 
-// To be able to distinguish these C++ functions, using std::function, from C functions, using raw function pointers, 
+// To be able to distinguish these C++ functions, using std::function, from C functions, using raw function pointers,
 // we need to reverse params order.
 // Note that FROM the compiler point of view
 //   mfb_set_XXX_callback(window, &my_c_func)
@@ -10,21 +10,21 @@
 //   mfb_set_XXX_callback(window, [](...) {})
 // have the same parameters.
 //
-void mfb_set_active_callback      (std::function <void (struct mfb_window*, bool)> func,                     
+void mfb_set_active_callback      (std::function <void (struct mfb_window*, bool)> func,
                                    struct mfb_window *window);
-void mfb_set_resize_callback      (std::function <void (struct mfb_window*, int, int)> func,                          
+void mfb_set_resize_callback      (std::function <void (struct mfb_window*, int, int)> func,
                                    struct mfb_window *window);
-void mfb_set_close_callback       (std::function <bool (struct mfb_window*)> func,                                     
+void mfb_set_close_callback       (std::function <bool (struct mfb_window*)> func,
                                    struct mfb_window *window);
 void mfb_set_keyboard_callback    (std::function <void (struct mfb_window*, mfb_key, mfb_key_mod, bool)> func,
                                    struct mfb_window *window);
-void mfb_set_char_input_callback  (std::function <void (struct mfb_window*, unsigned int)> func,                        
+void mfb_set_char_input_callback  (std::function <void (struct mfb_window*, unsigned int)> func,
                                    struct mfb_window *window);
 void mfb_set_mouse_button_callback(std::function <void (struct mfb_window*, mfb_mouse_button, mfb_key_mod, bool)> func,
                                    struct mfb_window *window);
-void mfb_set_mouse_move_callback  (std::function <void (struct mfb_window*, int, int)>func,                            
+void mfb_set_mouse_move_callback  (std::function <void (struct mfb_window*, int, int)>func,
                                    struct mfb_window *window);
-void mfb_set_mouse_scroll_callback(std::function <void (struct mfb_window*, mfb_key_mod, float, float)> func,          
+void mfb_set_mouse_scroll_callback(std::function <void (struct mfb_window*, mfb_key_mod, float, float)> func,
                                    struct mfb_window *window);
 
 template <class T> void mfb_set_active_callback (struct mfb_window* window, T* obj, void (T::*method)(struct mfb_window *, bool));

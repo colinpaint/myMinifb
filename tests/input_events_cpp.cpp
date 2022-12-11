@@ -1,5 +1,5 @@
 //{{{  includes
-#include <MiniFB.h>
+#include <MiniFB_cpp.h>
 
 #include <stdio.h>
 #include <stdint.h>
