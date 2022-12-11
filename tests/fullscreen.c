@@ -25,7 +25,7 @@ int main() {
     int              i;
     mfb_update_state state;
 
-    if(g_active) {
+    if (g_active) {
       for (i = 0; i < WIDTH * HEIGHT; ++i) {
         noise = seed;
         noise >>= 3;
@@ -38,7 +38,7 @@ int main() {
         g_buffer[i] = MFB_RGB(noise, noise, noise);
         }
 
-      state = mfb_update(window, g_buffer);
+      state = mfb_update (window, g_buffer);
       }
     else {
       state = mfb_update_events(window);

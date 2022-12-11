@@ -44,30 +44,25 @@ elseif (WIN32)
 endif()
 
 # Set GCC/Clang flags
-if(NOT MSVC)
+if (NOT MSVC)
   # Avoid default flag values
   set (CMAKE_C_FLAGS "")
   set (CMAKE_C_FLAGS_DEBUG "" )
   set (CMAKE_C_FLAGS_RELEASE "")
-
   set (CMAKE_CXX_FLAGS "")
   set (CMAKE_CXX_FLAGS_DEBUG "")
   set (CMAKE_CXX_FLAGS_RELEASE "")
-
   set (CMAKE_OBJC_FLAGS "")
   set (CMAKE_OBJC_FLAGS_DEBUG "")
   set (CMAKE_OBJC_FLAGS_RELEASE "")
-
   set (CMAKE_OBJCXX_FLAGS "")
   set (CMAKE_OBJCXX_FLAGS_DEBUG "")
   set (CMAKE_OBJCXX_FLAGS_RELEASE "")
 
-  # Set our flags
   add_compile_options ("$<$<CONFIG:Debug>:-g>")
   add_compile_options ("$<IF:$<CONFIG:Debug>,-O0,-O2>")
   add_compile_options (-Wall -Wextra)
   add_compile_options (-Wno-switch -Wno-unused-function -Wno-unused-parameter -Wno-implicit-fallthrough)
-
   add_compile_options (-Wno-cast-function-type)
 
 else()
@@ -108,25 +103,25 @@ else()
   add_compile_options (/Zc:__cplusplus)
 endif()
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
   add_definitions (-D_DEBUG)
   add_definitions (-DDEBUG)
 endif()
 
 # Set compiler/platform specific flags and dependencies
-if(WIN32)
-  if(MSVC)
+if (WIN32)
+  if (MSVC)
     add_definitions (-D_CRT_SECURE_NO_WARNINGS)
   endif()
   add_definitions (-D_WIN32_WINNT=0x0601)  # Windows 7 (we are in 2020)
 
-  if(USE_OPENGL_API)
+  if (USE_OPENGL_API)
     list (APPEND SrcLib ${SrcGL})
     add_definitions (-DUSE_OPENGL_API)
   endif()
 
   list (APPEND SrcLib ${SrcWindows})
-elseif(UNIX)
+elseif (UNIX)
   if (USE_WAYLAND_API)
     list (APPEND SrcLib ${SrcWayland})
   else()
@@ -139,7 +134,7 @@ elseif(UNIX)
 endif()
 
 # Library
-add_library (minifb STATIC ${SrcLib} )
+add_library (minifb STATIC ${SrcLib})
 
 # Link
 if (UNIX)
@@ -153,8 +148,8 @@ if (UNIX)
       target_link_libraries (minifb "-lGL" )
     endif()
   endif()
-elseif(WIN32)
-  if(USE_OPENGL_API)
+elseif (WIN32)
+  if (USE_OPENGL_API)
     target_link_libraries (minifb "Opengl32.lib" )
   endif()
   target_link_libraries (minifb "winmm.lib" )
@@ -166,25 +161,24 @@ target_include_directories (minifb PRIVATE src)
 link_libraries (minifb)
 
 # Examples
-if(MINIFB_BUILD_EXAMPLES)
+if (MINIFB_BUILD_EXAMPLES)
   add_executable (noise tests/noise.c )
-  add_executable (input_events tests/input_events.c )
-  add_executable (input_events_cpp tests/input_events_cpp.cpp )
-  add_executable (multiple_windows tests/multiple_windows.c )
   add_executable (hidpi tests/hidpi.c )
   add_executable (fullscreen tests/fullscreen.c )
+  add_executable (input_events_cpp tests/input_events_cpp.cpp )
+  add_executable (multiple_windows tests/multiple_windows.cpp )
 endif()
 
 # Organize IDE Folders
 set_property (GLOBAL PROPERTY USE_FOLDERS ON)
 set_property (TARGET minifb PROPERTY FOLDER "Libs")
 
-if(MINIFB_BUILD_EXAMPLES)
+if (MINIFB_BUILD_EXAMPLES)
   set_property (TARGET noise PROPERTY FOLDER "Tests")
-  set_property (TARGET input_events PROPERTY FOLDER "Tests")
+  set_property (TARGET hidpi PROPERTY FOLDER "Tests")
+  set_property (TARGET fullscreen PROPERTY FOLDER "Tests")
   set_property (TARGET input_events_cpp PROPERTY FOLDER "Tests")
   set_property (TARGET multiple_windows PROPERTY FOLDER "Tests")
-  set_property (TARGET hidpi PROPERTY FOLDER "Tests")
 endif()
 
 message (STATUS "Done " ${PROJECT_NAME})
