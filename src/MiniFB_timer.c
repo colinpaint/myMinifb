@@ -4,13 +4,13 @@
 #include <stdlib.h>
 //}}}
 
-double      g_timer_frequency;
-double      g_timer_resolution;
-double      g_time_for_frame = 1.0 / 60.0;
-bool        g_use_hardware_sync = false;
+double g_timer_frequency;
+double g_timer_resolution;
+double g_time_for_frame = 1.0 / 60.0;
+bool g_use_hardware_sync = false;
 
-extern uint64_t mfb_timer_tick(void);
-extern void mfb_timer_init(void);
+extern uint64_t mfb_timer_tick();
+extern void mfb_timer_init();
 
 //{{{
 void mfb_set_target_fps(uint32_t fps) {
@@ -52,14 +52,14 @@ struct mfb_timer * mfb_timer_create() {
 //}}}
 
 //{{{
-void mfb_timer_destroy(struct mfb_timer *tmr) {
+void mfb_timer_destroy (struct mfb_timer *tmr) {
     if(tmr != 0x0) {
         free(tmr);
     }
 }
 //}}}
 //{{{
-void mfb_timer_reset(struct mfb_timer *tmr) {
+void mfb_timer_reset (struct mfb_timer *tmr) {
     if(tmr == 0x0)
         return;
 
@@ -70,7 +70,7 @@ void mfb_timer_reset(struct mfb_timer *tmr) {
 //}}}
 
 //{{{
-double mfb_timer_now(struct mfb_timer *tmr) {
+double mfb_timer_now (struct mfb_timer *tmr) {
     uint64_t    counter;
 
     if(tmr == 0x0)
@@ -84,7 +84,7 @@ double mfb_timer_now(struct mfb_timer *tmr) {
 }
 //}}}
 //{{{
-double mfb_timer_delta(struct mfb_timer *tmr) {
+double mfb_timer_delta (struct mfb_timer *tmr) {
     int64_t     counter;
     uint64_t    delta;
 

@@ -49,17 +49,17 @@ typedef HRESULT(WINAPI *PFN_SetProcessDpiAwareness)(mfb_PROCESS_DPI_AWARENESS);
 typedef HRESULT(WINAPI *PFN_GetDpiForMonitor)(HMONITOR, mfb_MONITOR_DPI_TYPE, UINT *, UINT *);
 //}}}
 
-HMODULE mfb_shcore_dll = 0x0;
-PFN_SetProcessDpiAwareness mfb_SetProcessDpiAwareness = 0x0;
-PFN_GetDpiForMonitor mfb_GetDpiForMonitor = 0x0;
-
-long s_window_style = WS_POPUP | WS_SYSMENU | WS_CAPTION;
-
 extern short int g_keycodes[512];
 extern double g_time_for_frame;
 extern bool g_use_hardware_sync;
 extern double g_timer_frequency;
 extern double g_timer_resolution;
+
+HMODULE mfb_shcore_dll = 0x0;
+PFN_SetProcessDpiAwareness mfb_SetProcessDpiAwareness = 0x0;
+PFN_GetDpiForMonitor mfb_GetDpiForMonitor = 0x0;
+
+long s_window_style = WS_POPUP | WS_SYSMENU | WS_CAPTION;
 
 //{{{
 void load_functions() {
